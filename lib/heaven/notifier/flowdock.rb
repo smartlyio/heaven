@@ -15,24 +15,27 @@ module Heaven
           Rails.logger.error "Could not find flow token for flow #{chat_room}"
           return
         end
-        response = thread_client.post do |req|
-          req.url "/messages",
-          req.body = {
-            :flow_token => flow_token,
-            :event => "activity",
-            :external_thread_id => flowdock_thread_id,
-            :thread => thread_data,
-            :title => activity_title,
-            :author => activity_author,
-            :tags => tags
+        message_body = {
+          :flow_token => flow_token,
+          :event => "activity",
+          :external_thread_id => flowdock_thread_id,
+          :thread => thread_data,
+          :title => activity_title,
+          :author => activity_author,
+          :tags => tags,
+          :source => {
+            "application" => "Heaven",
+            "icon" => ENV["FLOWDOCK_USER_AVATAR"] || build_status_avatar
           }
-          req.headers["X-flowdock-wait-for-message"] = "true"
-        end
+        }
+        response = thread_client.post( "/messages", JSON.generate( message_body ), {"X-flowdock-wait-for-message": "true"})
+        Rails.logger.error "State: #{state}, #{autodeploy?}"
         return if state != "pending" || autodeploy?
         answer_to_chat(response.body["thread_id"])
       end
 
       def answer_to_chat(deployment_thread_id)
+        Rails.logger.error "Answering to chat"
         flow = auth_client.get("/flows/find", :id => chat_room)
         params = {
           :content => "Deployment started: #{thread_url(flow, deployment_thread_id)}"
@@ -43,6 +46,8 @@ module Heaven
           params[:message_id] = message_id
         end
         params[:flow] = chat_room
+        Rails.logger.error "Chat params"
+        Rails.logger.errr params
         auth_client.chat_message(params)
       end
 
@@ -91,7 +96,8 @@ module Heaven
           },
           { :label => "Environment", :value => environment },
           { :label => "Previous deployment", :value => previous_deployment_link },
-          { :label => "Application", :value => repo_name }
+          { :label => "Application", :value => repo_name },
+          { :label => "Project", :value => data["payload"]["config"]["project"] || "" }
         ]
       end
 
