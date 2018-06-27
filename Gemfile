@@ -1,10 +1,10 @@
-ruby "2.3.1"
+ruby "2.3.4"
 source "https://rubygems.org"
 
 gem "rails",    "~>4.2.2"
 gem "resque"
 gem "resque-lock-timeout"
-gem "octokit"
+gem "octokit", "<4.0"
 gem "unicorn"
 gem "yajl-ruby"
 gem "posix-spawn"
@@ -28,6 +28,7 @@ group :test do
   gem "webmock"
   gem "simplecov", "0.7.1"
   gem "rubocop"
+  gem "parser"
   gem "rspec-rails"
 end
 
