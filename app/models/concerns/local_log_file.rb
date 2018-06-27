@@ -34,6 +34,7 @@ module LocalLogFile
     #   cmds = ["my_command", "'foo=bar lazy=true'"] will fail
     # The correct way is
     #   cmds = ["my_command", "foo=bar lazy=true"]
+    Rails.logger.info "Executing cmds: #{cmds}"
     @last_child = POSIX::Spawn::Child.new(env, *cmds, execute_options)
 
     log_stdout(last_child.out)

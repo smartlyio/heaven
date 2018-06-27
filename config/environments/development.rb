@@ -26,4 +26,7 @@ Heaven::Application.configure do
   # This option may cause significant delays in view rendering with a large
   # number of complex assets.
   config.assets.debug = true
+
+  # Set to :debug to see everything in the log.
+  config.log_level = :debug
 end

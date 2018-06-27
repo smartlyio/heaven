@@ -49,6 +49,8 @@ class Receiver
   end
 
   def run!
+    Rails.logger.info "Running receiver with event: #{event}"
+
     if event == "deployment"
       run_deployment!
     elsif event == "deployment_status"
