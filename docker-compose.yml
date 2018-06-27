@@ -1,8 +1,8 @@
-version: "2"
+version: "3"
 services:
     redis:
         image: redis
-        container_name: heaven_redis
+        container_name: heaven-redis
         networks:
             - heaven
     test:
@@ -16,10 +16,64 @@ services:
             REDIS_CONTAINER_URL: redis://heaven_redis
         volumes:
             - ./:/usr/lib/heaven
+            - bundle:/bundle
+            - tmp:/tmp
         depends_on:
             - redis
         networks:
             - heaven
+    postgres:
+      image: postgres
+      container_name: heaven-postgres
+      networks:
+        - heaven
+      environment:
+        - POSTGRES_USER=heaven
+    dev:
+      build:
+        context: .
+      image: emdentec/heaven
+      volumes:
+          - .:/usr/lib/heaven
+          - bundle:/bundle
+          - tmp:/tmp
+      depends_on:
+          - redis
+          - postgres
+      networks:
+          - heaven
+      env_file: env.list
+      ports:
+        - 32768:80
+    worker1:
+      image: emdentec/heaven
+      networks:
+        - heaven
+      volumes:
+          - .:/usr/lib/heaven
+          - bundle:/bundle
+          - tmp:/tmp
+      entrypoint: ["wait-for-it.sh", "dev:80", "--"]
+      command: ["rake", "resque:work", "QUEUE=*"]
+      env_file: env.list
+      depends_on:
+        - dev
+    worker2:
+      image: emdentec/heaven
+      networks:
+        - heaven
+      volumes:
+          - .:/usr/lib/heaven
+          - bundle:/bundle
+          - tmp:/tmp
+      entrypoint: ["wait-for-it.sh", "dev:80", "--"]
+      command: ["rake", "resque:work", "QUEUE=*"]
+      env_file: env.list
+      depends_on:
+        - dev
 networks:
     heaven:
         driver: bridge
+volumes:
+  bundle:
+  tmp:
