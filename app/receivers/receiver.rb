@@ -1,5 +1,3 @@
-require "json"
-
 # A class to handle incoming webhooks
 class Receiver
   @queue = :events
@@ -9,11 +7,11 @@ class Receiver
   def initialize(event, guid, data)
     @guid  = guid
     @event = event
-    @data  = JSON.parse(data)
+    @data  = data
   end
 
   def self.perform(event, guid, data)
-    receiver = new(event, guid, data["payload"])
+    receiver = new(event, guid, data)
 
     if receiver.active_repository?
       receiver.run!
