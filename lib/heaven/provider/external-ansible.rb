@@ -72,7 +72,7 @@ module Heaven
         Dir.chdir(ansible_root) do
           execute_and_log(["git", "fetch"])
           execute_and_log(["git", "reset", "--hard", ansible_branch])
-          execute_and_log(["git-crypt", "unlock", "/usr/lib/heaven/crypt-key"])
+          execute_and_log(["git-crypt", "unlock", ENV['GITCRYPT_KEY_PATH'])
           execute_and_log(["find . -name deploy_key.priv -exec chmod 0600 {} \\;"])
 
           ansible_hosts_file = "#{ansible_root}/servers"
@@ -85,7 +85,7 @@ module Heaven
 
           ansible_extra_vars = [
             "heaven_deploy_sha=#{sha}",
-            "ansible_ssh_private_key_file=/usr/lib/heaven/id_rsa",
+            "ansible_ssh_private_key_file=#{ENV['ANSIBLE_REPO_SSH_KEY_PATH']}",
             "ansible_ssh_common_args='-o ControlMaster=auto -o ControlPersist=600s'",
             "pipelining=True",
             "version=#{deploy_version}",
