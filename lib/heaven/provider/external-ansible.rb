@@ -10,7 +10,7 @@ module Heaven
       end
 
       def ansible_repo_name
-        data["deployment"]["payload"]["config"]["ansible"]
+        ENV['ANSIBLE_REPOSITORY']
       end
 
       def project_to_deploy
@@ -28,6 +28,10 @@ module Heaven
       def ansible_root
         @ansible_root ||= "/tmp/" + \
           Digest::SHA1.hexdigest([ansible_repo_name, github_token].join)
+      end
+
+      def working_directory
+        ansible_root
       end
 
       def octokit_web_endpoint
@@ -60,42 +64,41 @@ module Heaven
           execute_and_log(["git", "clone", ansible_clone_url, ansible_root])
         end
 
-        if project_to_deploy == "app"
-          img_data = data.clone
+        if project_to_deploy == "v1"
+          tag_data = data.clone
           phpworkers_data = data.clone
-          img_data["deployment"]["payload"]["config"]["project"] = "img"
+          tag_data["deployment"]["payload"]["config"]["project"] = "tag"
           phpworkers_data["deployment"]["payload"]["config"]["project"] = "phpworkers"
-          Resque.enqueue(Heaven::Jobs::Deployment, "#{@guid}-img", img_data)
+          data["deployment"]["payload"]["config"]["project"] = "webapp"
+          Resque.enqueue(Heaven::Jobs::Deployment, "#{@guid}-tag", tag_data)
           Resque.enqueue(Heaven::Jobs::Deployment, "#{@guid}-phpworkers", phpworkers_data)
         end
 
         Dir.chdir(ansible_root) do
           execute_and_log(["git", "fetch"])
           execute_and_log(["git", "reset", "--hard", ansible_branch])
-          execute_and_log(["git-crypt", "unlock", ENV['GITCRYPT_KEY_PATH'])
+          execute_and_log(["git-crypt", "unlock", ENV['GITCRYPT_KEY_PATH']])
           execute_and_log(["find . -name deploy_key.priv -exec chmod 0600 {} \\;"])
 
-          ansible_hosts_file = "#{ansible_root}/servers"
           ansible_site_file = "#{ansible_root}/ansistrano_deploy_#{project_to_deploy}.yml"
+          ansible_hosts_file = "#{ansible_root}/inventories/production/hosts"
 
           unless File.file?(ansible_site_file)
             log "ERROR_INVALID_PROJECT"
             exit 101
           end
-
+          ssh_common_args = ENV['ANSIBLE_SSH_COMMON_ARGS'] ? "--ssh-common-args=#{ENV['ANSIBLE_SSH_COMMON_ARGS']}" : ""
           ansible_extra_vars = [
             "heaven_deploy_sha=#{sha}",
-            "ansible_ssh_private_key_file=#{ENV['ANSIBLE_REPO_SSH_KEY_PATH']}",
-            "ansible_ssh_common_args='-o ControlMaster=auto -o ControlPersist=600s'",
-            "pipelining=True",
+            "ansible_ssh_private_key_file=#{ENV['ANSIBLE_DEPLOY_SSH_KEY_PATH']}",
             "version=#{deploy_version}",
-            "ansistrano_release_version=#{deploy_version}-#{Time.now.strftime('%Y%m%d%H%M%SZ')}",
+            "ansistrano_release_version=#{deploy_version}-#{Time.now.strftime('%Y%m%d%H%M%SZ')}"
           ].map { |e| "-e #{e}" }.join(" ")
 
           deploy_string = ["ansible-playbook", "-i", ansible_hosts_file, "-l", deploy_target, ansible_site_file,
                            "--verbose", "#{ansible_extra_vars}",
-                            "-u", "smartly", "-vvvv"]
-          execute_and_log(deploy_string,  "ANSIBLE_HOST_KEY_CHECKING" => "false")
+                            "-u", "smartly", "-vvvv", ssh_common_args]
+          execute_and_log(deploy_string)
         end
       end
     end
