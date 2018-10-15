@@ -37,14 +37,14 @@ module LocalLogFile
     Rails.logger.info "Executing cmds: #{cmds}"
     @last_child = POSIX::Spawn::Child.new(env, *cmds, execute_options)
 
-    log_stdout(last_child.out)
-    log_stderr(last_child.err)
+    log_stdout(@last_child.out)
+    log_stderr(@last_child.err)
 
-    unless last_child.success?
+    unless @last_child.success?
       fail StandardError, "Task failed: #{cmds.join(" ")}"
     end
 
-    last_child
+    @last_child
   end
 
   def execute_options

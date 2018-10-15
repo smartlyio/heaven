@@ -9,6 +9,30 @@ module Heaven
       include FlowdockApi
       include FlowdockMessageHelper
 
+      ADJECTIVES = [
+        'Amazing',
+        'Awesome',
+        'Excellent',
+        'Fabulous',
+        'Fantastic',
+        'Fine',
+        'Fortuitous',
+        'Great',
+        'Incredible',
+        'Ineffable',
+        'Marvelous',
+        'Mirthful',
+        'Outstanding',
+        'Perfect',
+        'Remarkable',
+        'Smart',
+        'Spectacular',
+        'Splendid',
+        'Stellar',
+        'Stupendous',
+        'Wondrous'
+      ]
+
       def deliver(message)
         Rails.logger.info "flowdock: #{message}"
         if flow_token.nil?
@@ -30,15 +54,29 @@ module Heaven
         }
         response = thread_client.post( "/messages", JSON.generate( message_body ), {"X-flowdock-wait-for-message": "true"})
         Rails.logger.error "State: #{state}, #{autodeploy?}"
-        return if state != "pending" || autodeploy?
-        answer_to_chat(response.body["thread_id"])
+        chat_message = "@#{chat_user}, "
+        case state
+        when "success"
+          chat_message << "your deployment of #{repo_name} to #{environment} has been completed! #{ascii_face}\n"
+          chat_message << "Please remember to monitor the relevant dashboards to make sure everything went into pipe.\n"
+        when "failure"
+          chat_message << "your deployment of #{repo_name} to #{environment} failed! #{ascii_face}\n"
+        when "error"
+          chat_message << "your deployment of #{repo_name} to #{environment} has errors! #{ascii_face}\n"
+          chat_message << description unless description =~ /Deploying from Heaven/
+        when "pending"
+          chat_message << "#{ADJECTIVES.sample} idea! Deploying #{repo_name} to #{environment}!"
+        else
+          Rails.logger.error "Unhandled deployment state, #{state}"
+        end
+        answer_to_chat(chat_message, response.body["thread_id"])
       end
 
-      def answer_to_chat(deployment_thread_id)
+      def answer_to_chat(message, deployment_thread_id)
         Rails.logger.error "Answering to chat"
         flow = auth_client.get("/flows/find", :id => chat_room)
         params = {
-          :content => "Deployment started: #{thread_url(flow, deployment_thread_id)}"
+          :content => "#{message} Details here: #{thread_url(flow, deployment_thread_id)}"
         }
         if !thread_id.blank?
           params[:thread_id] = thread_id
@@ -47,7 +85,7 @@ module Heaven
         end
         params[:flow] = chat_room
         Rails.logger.error "Chat params"
-        Rails.logger.errr params
+        Rails.logger.error params
         auth_client.chat_message(params)
       end
 
@@ -97,7 +135,7 @@ module Heaven
           { :label => "Environment", :value => environment },
           { :label => "Previous deployment", :value => previous_deployment_link },
           { :label => "Application", :value => repo_name },
-          { :label => "Project", :value => data["payload"]["config"]["project"] || "" }
+          { :label => "Project", :value => deployment_payload["config"]["project"] || "" }
         ]
       end
 

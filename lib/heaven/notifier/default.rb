@@ -23,8 +23,8 @@ module Heaven
       def ascii_face
         case state
         when "pending" then "•̀.̫•́✧"
-        when "success" then "(◕‿◕)"
-        when "failure" then "ಠﭛಠ"
+        when "success" then "d(^_^d)"
+        when "failure" then "(╯°□°）╯︵ ┻━┻"
         when "error"   then "¯_(ツ)_/¯"
         else
           "٩◔̯◔۶"
