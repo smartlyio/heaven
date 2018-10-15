@@ -1,0 +1,20 @@
+version: "3"
+services:
+    heaven:
+      build:
+        context: .
+      image: ${IMAGE}
+      volumes:
+          - .:/usr/lib/heaven
+          - bundle:/bundle
+          - tmp:/tmp
+      networks:
+          - heaven
+      ports:
+        - 32768:80
+networks:
+    heaven:
+        driver: bridge
+volumes:
+  bundle:
+  tmp:
