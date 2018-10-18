@@ -14,7 +14,7 @@ module Heaven
       end
 
       def project_to_deploy
-        data["deployment"]["payload"]["config"]["project"]
+        data["deployment"]["payload"]["config"]["project"] || data["deployment"]["payload"]["name"]
       end
 
       def deploy_target
@@ -85,6 +85,7 @@ module Heaven
 
           unless File.file?(ansible_site_file)
             log "ERROR_INVALID_PROJECT (#{project_to_deploy})"
+            log "Payload was: #{data.to_json}"
             exit 101
           end
           ssh_common_args = ENV['ANSIBLE_SSH_COMMON_ARGS'] ? "--ssh-common-args=#{ENV['ANSIBLE_SSH_COMMON_ARGS']}" : ""
