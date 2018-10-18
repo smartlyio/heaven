@@ -84,7 +84,7 @@ module Heaven
           ansible_hosts_file = "#{ansible_root}/inventories/production/hosts"
 
           unless File.file?(ansible_site_file)
-            log "ERROR_INVALID_PROJECT"
+            log "ERROR_INVALID_PROJECT (#{project_to_deploy})"
             exit 101
           end
           ssh_common_args = ENV['ANSIBLE_SSH_COMMON_ARGS'] ? "--ssh-common-args=#{ENV['ANSIBLE_SSH_COMMON_ARGS']}" : ""
