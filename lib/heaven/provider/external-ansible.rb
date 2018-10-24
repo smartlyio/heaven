@@ -18,7 +18,7 @@ module Heaven
       end
 
       def deploy_target
-        data["deployment"]["payload"]["config"]["target"] || "all"
+        data["deployment"]["payload"]["hosts"] || "all"
       end
 
       def deploy_version

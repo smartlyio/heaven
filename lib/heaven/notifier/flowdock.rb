@@ -57,15 +57,15 @@ module Heaven
         chat_message = "@#{chat_user}, "
         case state
         when "success"
-          chat_message << "your deployment of #{repo_name} to #{environment} has been completed! #{ascii_face}\n"
+          chat_message << "your deployment of #{repo_name} to #{deployment_hosts || environment} has been completed! #{ascii_face}\n"
           chat_message << "Please remember to monitor the relevant dashboards to make sure everything went into pipe.\n"
         when "failure"
-          chat_message << "your deployment of #{repo_name} to #{environment} failed! #{ascii_face}\n"
+          chat_message << "your deployment of #{repo_name} to #{deployment_hosts || environment} failed! #{ascii_face}\n"
         when "error"
-          chat_message << "your deployment of #{repo_name} to #{environment} has errors! #{ascii_face}\n"
+          chat_message << "your deployment of #{repo_name} to #{deployment_hosts || environment} has errors! #{ascii_face}\n"
           chat_message << description unless description =~ /Deploying from Heaven/
         when "pending"
-          chat_message << "#{ADJECTIVES.sample} idea! Deploying #{repo_name} to #{environment}!"
+          chat_message = "#{ADJECTIVES.sample} idea! Deploying #{repo_name} to #{deployment_hosts || environment}!"
         else
           Rails.logger.error "Unhandled deployment state, #{state}"
         end
@@ -135,7 +135,8 @@ module Heaven
           { :label => "Environment", :value => environment },
           { :label => "Previous deployment", :value => previous_deployment_link },
           { :label => "Application", :value => repo_name },
-          { :label => "Project", :value => deployment_payload["config"]["project"] || "" }
+          { :label => "Project", :value => deployment_payload["config"]["project"] || "" },
+          { :label => "Hosts", :value => deployment_payload["hosts"] || "all" }
         ]
       end
 

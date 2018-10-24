@@ -99,6 +99,10 @@ module Heaven
         @deployment_payload ||= deployment["payload"]
       end
 
+      def deployment_hosts
+        deployment_payload["hosts"] if deployment_payload["hosts"] && deployment_payload["hosts"] != ""
+      end
+
       def chat_user
         deployment_payload["notify"]["user_name"] ||
           deployment_payload["notify"]["user"] || "unknown"
