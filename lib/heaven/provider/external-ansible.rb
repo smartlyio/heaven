@@ -27,7 +27,7 @@ module Heaven
 
       def ansible_root
         @ansible_root ||= "/tmp/" + \
-          Digest::SHA1.hexdigest([ansible_repo_name, github_token].join)
+          Digest::SHA1.hexdigest([ansible_repo_name, github_token, project_to_deploy].join)
       end
 
       def working_directory
@@ -58,25 +58,17 @@ module Heaven
         return execute_and_log(["/usr/bin/true"]) if Rails.env.test?
 
         log "This is external Ansible deployment provider!"
+        log "Project to deploy is: #{project_to_deploy}"
 
         unless File.exist?(ansible_root)
           log "Cloning #{ansible_clone_url} into #{ansible_root}"
           execute_and_log(["git", "clone", ansible_clone_url, ansible_root])
         end
 
-        if project_to_deploy == "v1"
-          tag_data = data.clone
-          phpworkers_data = data.clone
-          tag_data["deployment"]["payload"]["config"]["project"] = "tag"
-          phpworkers_data["deployment"]["payload"]["config"]["project"] = "phpworkers"
-          data["deployment"]["payload"]["config"]["project"] = "webapp"
-          Resque.enqueue(Heaven::Jobs::Deployment, "#{@guid}-tag", tag_data)
-          Resque.enqueue(Heaven::Jobs::Deployment, "#{@guid}-phpworkers", phpworkers_data)
-        end
-
         Dir.chdir(ansible_root) do
           execute_and_log(["git", "fetch"])
           execute_and_log(["git", "reset", "--hard", ansible_branch])
+          execute_and_log(["git", "pull"])
           execute_and_log(["git-crypt", "unlock", ENV['GITCRYPT_KEY_PATH']])
           execute_and_log(["find . -name deploy_key.priv -exec chmod 0600 {} \\;"])
 
@@ -97,8 +89,8 @@ module Heaven
           ].map { |e| "-e #{e}" }.join(" ")
 
           deploy_string = ["ansible-playbook", "-i", ansible_hosts_file, "-l", deploy_target, ansible_site_file,
-                           "--verbose", "#{ansible_extra_vars}",
-                            "-u", "smartly", "-vvvv", ssh_common_args]
+                            "#{ansible_extra_vars}",
+                            "-u", "smartly", ssh_common_args]
           execute_and_log(deploy_string)
         end
       end
