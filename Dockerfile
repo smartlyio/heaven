@@ -16,7 +16,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367 16
 WORKDIR /usr/bin
 
 RUN wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh \
-  && echo '0f75de5c9d9c37a933bb9744ffd710750d5773892930cfe40509fa505788835c  wait-for-it.sh' | sha256sum -c - \
+  && echo '3f3790f899f53d1a10947f0b992b122a358ffa34997d8c0fe126a02bba806917  wait-for-it.sh' | sha256sum -c - \
   && chmod a+x wait-for-it.sh
 
 RUN mkdir -p /root/.ssh
