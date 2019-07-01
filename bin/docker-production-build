@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -e
+
+CONFIG_FILE="docker-compose.production.yml"
+PROJECT_NAME="heaven"
+IMAGE="prod.smartly.af/heaven"
+TAG="latest"
+
+IMAGE="${IMAGE}" \
+TAG="${TAG}" \
+docker-compose \
+  -f "${CONFIG_FILE}" \
+  -p "${PROJECT_NAME}" \
+  build heaven
+
+docker push "${IMAGE}:${TAG}"
