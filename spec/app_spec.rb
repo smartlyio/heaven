@@ -1,3 +1,4 @@
+require 'securerandom'
 require "spec_helper"
 
 describe "app.json config for heroku" do
