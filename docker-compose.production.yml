@@ -6,7 +6,6 @@ services:
       image: ${IMAGE}
       volumes:
           - .:/usr/lib/heaven
-          - bundle:/bundle
           - tmp:/tmp
       networks:
           - heaven
@@ -16,5 +15,4 @@ networks:
     heaven:
         driver: bridge
 volumes:
-  bundle:
   tmp:

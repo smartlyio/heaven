@@ -136,7 +136,9 @@ module Heaven
           { :label => "Previous deployment", :value => previous_deployment_link },
           { :label => "Application", :value => repo_name },
           { :label => "Project", :value => deployment_payload["config"]["project"] || "" },
-          { :label => "Hosts", :value => deployment_payload["hosts"] || "all" }
+          { :label => "Hosts", :value => deployment_payload["hosts"] || "all" },
+          { :label => "Deployer", :value => chat_user }
+
         ]
       end
 
