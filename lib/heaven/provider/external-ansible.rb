@@ -3,6 +3,8 @@ module Heaven
   module Provider
     # The capistrano provider.
     class ExternalAnsible < DefaultProvider
+      include StreamingLogFile
+
       def initialize(guid, payload)
         super
         @name = "external-ansible"
