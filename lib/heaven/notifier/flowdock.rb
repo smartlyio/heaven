@@ -57,6 +57,7 @@ module Heaven
         chat_message = "@#{chat_user}, "
         case state
         when "success"
+          chat_message = "#{chat_user}, "
           chat_message << "your deployment of #{repo_name} to #{deployment_hosts || environment} has been completed! #{ascii_face}\n"
           chat_message << "Please remember to monitor the relevant dashboards to make sure everything went into pipe.\n"
         when "failure"
