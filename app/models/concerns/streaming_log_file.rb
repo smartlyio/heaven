@@ -72,20 +72,20 @@ module StreamingLogFile
     read_and_log(stdout, stderr, execute_options[:timeout])
 
     ::Process::waitpid(pid)
-    @status = $?
-    unless @status.success?
+    @last_child = $?
+    unless @last_child.success?
       fail StandardError, "Task failed: #{cmds.join(" ")}"
     end
-    @status
+    @last_child
   rescue => e
     if stderr_file_fd && !stderr_file_fd.closed?
       stderr_file_fd.write(e.backtrace.join("\n") + "\n")
       stderr_file_fd.write(e.to_s + "\n")
     end
-    if @status.nil? && pid
+    if @last_child.nil? && pid
       ::Process::kill('TERM', pid) rescue nil
       ::Process::waitpid(pid)
-      @status = $?
+      @last_child = $?
     end
     raise
   ensure
