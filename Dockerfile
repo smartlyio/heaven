@@ -29,7 +29,7 @@ WORKDIR $WORK_DIR
 
 COPY ./bin/docker-entrypoint.sh /docker-entrypoint.sh
 COPY . ./
-RUN bundle install --clean
+RUN bundle install
 
 EXPOSE 80
 
