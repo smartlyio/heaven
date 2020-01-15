@@ -27,6 +27,10 @@ module Heaven
         data["deployment"]["ref"]
       end
 
+      def notify_user
+        data["deployment"]["payload"]["notify"]["user_name"] || "unknown"
+      end
+
       def ansible_root
         @ansible_root ||= "/tmp/" + \
           Digest::SHA1.hexdigest([ansible_repo_name, github_token, project_to_deploy].join)
@@ -87,7 +91,8 @@ module Heaven
             "heaven_deploy_sha=#{sha}",
             "ansible_ssh_private_key_file=#{ENV['ANSIBLE_DEPLOY_SSH_KEY_PATH']}",
             "version=#{deploy_version}",
-            "ansistrano_release_version=#{deploy_version}-#{Time.now.strftime('%Y%m%d%H%M%SZ')}"
+            "ansistrano_release_version=#{deploy_version}-#{Time.now.strftime('%Y%m%d%H%M%SZ')}",
+            "flowdock_user=#{notify_user}"
           ].map { |e| "-e #{e}" }.join(" ")
 
           deploy_string = ["ansible-playbook", "-i", ansible_hosts_file, "-l", deploy_target, ansible_site_file,
