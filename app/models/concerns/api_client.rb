@@ -25,9 +25,9 @@ module ApiClient
 
   def oauth_client_api
     @oauth_client_api ||= Octokit::Client.new(
-      :client_id     => github_client_id,
-      :client_secret => github_client_secret,
-      :api_endpoint  => github_api_endpoint
+      :login        => github_client_id,
+      :password     => github_client_secret,
+      :api_endpoint => github_api_endpoint
     )
   end
 end
