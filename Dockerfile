@@ -3,13 +3,13 @@ FROM ubuntu:bionic
 RUN apt-get update --quiet=2 \
   && apt-get upgrade --assume-yes \
   && apt-get install --assume-yes --no-install-recommends gnupg wget ca-certificates git-crypt ruby bundler \
-  build-essential ruby-dev zlib1g-dev libxml2-dev libxslt-dev libpq-dev libsqlite3-dev openssh-client python-git python-requests
+  build-essential ruby-dev zlib1g-dev libxml2-dev libxslt-dev libpq-dev libsqlite3-dev openssh-client python-git python-requests \
+  python3 python3-pip
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 93C4A3FD7BB9C367 1646B01B86E50310 \
-  && echo "deb http://ppa.launchpad.net/ansible/ansible-2.8/ubuntu bionic main" > /etc/apt/sources.list.d/ansible-2.8.list \
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1646B01B86E50310 \
   && echo "deb http://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
   && apt-get update --quiet=2 \
-  && apt-get install --assume-yes --no-install-recommends ansible=2.8.* curl nodejs=8.* yarn \
+  && apt-get install --assume-yes --no-install-recommends curl nodejs=8.* yarn \
   && apt-get autoremove --assume-yes \
   && apt-get clean \
   && rm -rf /var/lib/apt/lists/*

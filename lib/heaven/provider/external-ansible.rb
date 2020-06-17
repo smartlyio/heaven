@@ -77,6 +77,7 @@ module Heaven
           execute_and_log(["git", "pull"])
           execute_and_log(["git-crypt", "unlock", ENV['GITCRYPT_KEY_PATH']])
           execute_and_log(["find . -name deploy_key.priv -exec chmod 0600 {} \\;"])
+          execute_and_log(["pip3", "install", "-r", "requirements.txt"])
 
           ansible_site_file = "#{ansible_root}/ansistrano_deploy_#{project_to_deploy}.yml"
           ansible_hosts_file = "#{ansible_root}/inventories/production/hosts"
