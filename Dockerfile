@@ -4,7 +4,7 @@ RUN apt-get update --quiet=2 \
   && apt-get upgrade --assume-yes \
   && apt-get install --assume-yes --no-install-recommends gnupg wget ca-certificates git-crypt ruby bundler \
   build-essential ruby-dev zlib1g-dev libxml2-dev libxslt-dev libpq-dev libsqlite3-dev openssh-client python-git python-requests \
-  python3 python3-pip
+  python3 python3-pip python3-dev
 
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1646B01B86E50310 \
   && echo "deb http://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
