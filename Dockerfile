@@ -6,8 +6,9 @@ RUN apt-get update --quiet=2 \
   build-essential ruby-dev zlib1g-dev libxml2-dev libxslt-dev libpq-dev libsqlite3-dev openssh-client python-git python-requests \
   python3 python3-pip python3-dev
 
-RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1646B01B86E50310 \
+RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1646B01B86E50310 1655A0AB68576280 \
   && echo "deb http://dl.yarnpkg.com/debian/ stable main" > /etc/apt/sources.list.d/yarn.list \
+  && echo "deb https://deb.nodesource.com/node_12.x bionic main" > /etc/apt/sources.list.d/nodesource.list \
   && apt-get update --quiet=2 \
   && apt-get install --assume-yes --no-install-recommends curl nodejs=12.* yarn \
   && apt-get autoremove --assume-yes \
@@ -17,7 +18,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv-keys 1646B01B86E50310 \
 WORKDIR /usr/bin
 
 RUN wget https://raw.githubusercontent.com/vishnubob/wait-for-it/master/wait-for-it.sh \
-  && echo '2ea7475e07674e4f6c1093b4ad6b0d8cbbc6f9c65c73902fb70861aa66a6fbc0  wait-for-it.sh' | sha256sum -c - \
+  && echo 'b7a04f38de1e51e7455ecf63151c8c7e405bd2d45a2d4e16f6419db737a125d6 wait-for-it.sh' | sha256sum -c - \
   && chmod a+x wait-for-it.sh
 
 RUN mkdir -p /root/.ssh
