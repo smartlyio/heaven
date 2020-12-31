@@ -108,7 +108,7 @@ GEM
       mime-types-data (~> 3.2015)
     mime-types-data (3.2016.0521)
     mimemagic (0.3.2)
-    mini_portile2 (2.2.0)
+    mini_portile2 (2.4.0)
     minitest (5.10.3)
     mono_logger (1.1.0)
     multi_json (1.12.1)
@@ -121,8 +121,8 @@ GEM
     net-ssh (4.1.0)
     net-ssh-gateway (2.0.0)
       net-ssh (>= 4.0.0)
-    nokogiri (1.8.0)
-      mini_portile2 (~> 2.2.0)
+    nokogiri (1.10.10)
+      mini_portile2 (~> 2.4.0)
     octokit (3.8.0)
       sawyer (~> 0.6.0, >= 0.5.3)
     parallel (1.19.1)
@@ -275,7 +275,7 @@ DEPENDENCIES
   foreman
   hipchat
   meta_request
-  nokogiri (= 1.8.0)
+  nokogiri (= 1.10.10)
   octokit (< 4.0)
   parser
   pg
